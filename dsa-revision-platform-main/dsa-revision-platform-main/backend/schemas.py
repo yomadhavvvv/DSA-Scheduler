@@ -1,0 +1,85 @@
+from datetime import datetime
+
+from pydantic import BaseModel
+
+
+class Problem(BaseModel):
+    id: int
+    slug: str
+    title: str
+    difficulty: str
+    topic: str
+    description: str | None = None
+    hints: list[str] | None = None
+    leetcode_url: str | None = None
+
+
+class SubmissionCreate(BaseModel):
+    problem_id: int
+    code: str
+    language: str
+
+
+class SubmissionResult(BaseModel):
+    id: int
+    problem_id: int
+    user_id: int
+    code: str
+    language: str
+    verdict: str
+    submitted_at: datetime
+
+    class Config:
+        from_attributes = True
+
+class UserCreate(BaseModel):
+    email: str
+    password: str
+
+class UserResponse(BaseModel):
+    id: int
+    email: str
+
+    class Config:
+        from_attributes = True
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
+class DueReview(BaseModel):
+    problem: Problem
+    next_review_due: datetime
+    interval_days: int
+
+    class Config:
+        from_attributes = True
+
+class ProblemWithProgress(Problem):
+    next_review_due: datetime | None = None
+    interval_days: int | None = None
+
+class TopicAnalytics(BaseModel):
+    topic: str
+    total_problems: int
+    attempted: int
+    accepted: int
+    coverage: float
+    acceptance_rate: float
+    status: str
+
+class ProblemCreate(BaseModel):
+    title: str
+    leetcode_url: str | None = None
+    difficulty: str
+    topic: str
+    description: str | None = None
+    hints: list[str] | None = None
+    solution_code: str | None = None
+    language: str | None = None
+
+class ExploreProblem(Problem):
+    in_library: bool = False
+
+class AddToLibraryRequest(BaseModel):
+    problem_id: int
