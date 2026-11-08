@@ -92,11 +92,9 @@ The API is organized around application resources such as problems, submissions,
 ### 1. Clone the repository
 
 ```bash
-git clone <your-repository-clone-address>
-cd <your-repository-folder>
+git clone https://github.com/yomadhavvvv/DSA-Scheduler.git
+cd DSA-Scheduler/dsa-revision-platform-main
 ```
-
-Replace the placeholders with the clone address and folder name of your own repository.
 
 ### 2. Configure environment variables
 
@@ -106,7 +104,7 @@ Do not commit `.env` files, database passwords, JWT secrets, or other credential
 
 ### 3. Start the application
 
-If using Docker Compose:
+If using Docker Compose, run the command from the directory containing `docker-compose.yml`:
 
 ```bash
 docker compose up --build
