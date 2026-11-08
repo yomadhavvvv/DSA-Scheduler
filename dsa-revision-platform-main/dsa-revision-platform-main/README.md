@@ -93,7 +93,7 @@ The API is organized around application resources such as problems, submissions,
 
 ```bash
 git clone https://github.com/yomadhavvvv/DSA-Scheduler.git
-cd DSA-Scheduler/dsa-revision-platform-main
+cd DSA-Scheduler/dsa-revision-platform-main/dsa-revision-platform-main
 ```
 
 ### 2. Configure environment variables
