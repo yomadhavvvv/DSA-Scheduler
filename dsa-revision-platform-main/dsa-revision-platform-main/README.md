@@ -1,128 +1,148 @@
-# Intelligent DSA Revision & Practice Platform
-![CI](https://github.com/24je0657/dsa-revision-platform/actions/workflows/ci.yml/badge.svg)
+# DSA Revision Platform
 
-A personalized, spaced-repetition coding practice platform that answers a more honest question than *"how many problems have I solved?"* — namely, **"how many of the problems I've previously learned can I still independently solve today?"**
+A full-stack application for organizing personal Data Structures and Algorithms (DSA) practice, tracking attempts, and helping learners revisit previously solved problems.
 
-Built end-to-end with a React/TypeScript frontend, a FastAPI backend, and a PostgreSQL database, fully containerized with Docker and deployed to production.
+**Author:** Madhav Kumar
 
-🔗 **Live Demo:** [dsa-revision-frontend.onrender.com](https://dsa-revision-frontend.onrender.com/)
-📦 **Repository:** [github.com/24je0657/dsa-revision-platform](https://github.com/24je0657/dsa-revision-platform)
+## Overview
 
-> **Note:** the live demo runs on Render's free tier — the backend spins down after periods of inactivity, so the first request after a while may take 30–60 seconds to respond.
-
----
-
-## The Problem
-
-Students preparing for technical interviews solve dozens of DSA problems, but often can't independently reproduce their own solutions weeks later. Revisiting a "solved" problem usually means re-reading old code or an editorial — which creates a false sense of mastery. This platform replaces that passive recognition loop with **active recall**: your own past solution stays hidden, hints are revealed progressively rather than all at once, and a spaced-repetition scheduler decides when each problem is actually due for review.
-
----
-
-## How it works
-### Revision Workflow
-
-<p align="center">
-  <img src="docs/images/revision-workflow.png" width="950">
-</p>
+Students often solve DSA problems but struggle to revisit them consistently. This application provides a personal problem library, records practice attempts, and surfaces problems for review. Topic-level progress information helps users identify areas that may need more practice.
 
 ## Features
 
-- **Personal problem library** — add problems you've solved elsewhere (e.g. LeetCode), with automatic deduplication by URL/slug so the same problem isn't duplicated across users
-- **Spoiler-free revision** — your previous solution is never shown; you attempt fresh, with your own code only visible in submission history after the fact
-- **Progressive hint system** — hints unlock one at a time, on request, instead of all at once
-- **Real code editor** — Monaco (the engine behind VS Code), with a per-problem language selector (C++, Python, Java, JavaScript) that remembers your last-used language for each problem
-- **Submission tracking** — every attempt is logged with verdict and timestamp, with live-updating history per problem
-- **Spaced-repetition scheduling** — an interval-doubling algorithm (reset to 1 day on a miss, doubled on success) determines when each problem is next due, surfaced on a dedicated "Due for Review" page
-- **Weak-topic analytics** — classifies each topic as *Strong*, *Weak*, or *Needs More Practice* using a coverage-and-mastery model (not just raw submission counts), fair to both large topics (Arrays, Graphs) and small ones (e.g. Biconnected Components)
-- **JWT authentication** — signup/login with bcrypt-hashed passwords, protected routes on both frontend and backend
+- **Personal problem library:** Add and manage DSA problems for individual practice.
+- **Problem deduplication:** Identify duplicate problems using canonical URLs and slugs.
+- **Revision queue:** Surface problems for review based on their stored scheduling information.
+- **Submission history:** Record attempts and display a history for each problem.
+- **Progress tracking:** View topic-level statistics and problem coverage.
+- **Authentication:** Protect user-specific functionality with JWT-based authentication and password hashing.
+- **REST API:** Backend endpoints support problem management, submissions, revision information, and user progress.
 
----
+## Technology Stack
 
-## Tech Stack
-
-| Layer | Technology |
+| Layer | Technologies |
 |---|---|
-| Frontend | React, TypeScript, Tailwind CSS, React Router, Monaco Editor, Vite |
-| Backend | FastAPI, SQLAlchemy, Alembic, Pydantic, python-jose (JWT), passlib/bcrypt |
-| Database | PostgreSQL |
-| Infrastructure | Docker, Docker Compose, Nginx, Render |
+| Frontend | React, TypeScript, Vite |
+| Backend | Python, FastAPI |
+| Database and ORM | PostgreSQL, SQLAlchemy |
+| Authentication | JWT, bcrypt password hashing |
+| Database migrations | Alembic |
+| Containerization | Docker, Docker Compose |
 
----
+## Architecture
 
+The application separates the frontend, API backend, and relational database.
 
-## System Architecture
+```text
+React + TypeScript frontend
+          |
+          | HTTP / REST
+          v
+      FastAPI backend
+          |
+          | SQLAlchemy
+          v
+       PostgreSQL
+          |
+          v
+     Alembic migrations
+```
 
-<p align="center">
-  <img src="docs/images/architecture.jpeg" width="950">
-</p>
+- The frontend provides the interface for managing problems and reviewing progress.
+- FastAPI handles application endpoints, request validation, and user-specific operations.
+- SQLAlchemy maps application entities to PostgreSQL tables.
+- Alembic manages database schema migrations.
+- Docker Compose provides a repeatable local development environment.
 
+## Core Workflows
 
-Each service — frontend, backend, database — runs as an independent Docker container. The frontend is a multi-stage build (Node.js builds the static bundle, Nginx serves it, configured with SPA-fallback routing for React Router). The backend runs database migrations automatically on startup via Alembic before starting Uvicorn, so deployments are reproducible from a genuinely empty database.
+### 1. Manage a personal problem library
 
----
+Users can add DSA problems and maintain their own practice collection. Canonical URL and slug handling helps prevent duplicate entries.
 
-## Getting Started Locally
+### 2. Record practice attempts
 
-### Option A — Docker Compose (recommended, mirrors production)
+The application stores submission records and makes attempt history available alongside problem information.
+
+**Current limitation:** The supplied implementation does not execute submitted source code against test cases. Stored verdicts should not be interpreted as independently verified online-judge results. Integrating a code-execution service is a future improvement.
+
+### 3. Review problems
+
+The application maintains review scheduling information and generates a queue of problems due for revision. The current scheduling logic uses interval-based updates and should not be described as a complete SM-2 implementation.
+
+### 4. Track progress
+
+The frontend presents topic-level progress information to help users understand their practice coverage and identify areas that may need more attention.
+
+## Backend and Data Engineering
+
+The backend uses a relational PostgreSQL database accessed through SQLAlchemy. Database schema changes are managed with Alembic migrations. Authentication uses JWTs, while passwords are stored using bcrypt hashing rather than plaintext.
+
+The API is organized around application resources such as problems, submissions, revision information, and user progress.
+
+## Getting Started
+
+### Prerequisites
+
+- Python version supported by the backend dependencies
+- Node.js and npm
+- PostgreSQL, or Docker with Docker Compose
+- Git
+
+### 1. Clone the repository
 
 ```bash
-git clone https://github.com/24je0657/dsa-revision-platform.git
-cd dsa-revision-platform
-# create a .env file at the project root with DB_PASSWORD and SECRET_KEY
+git clone https://github.com/yomadhavvvv/DSA-Scheduler.git
+cd DSA-Scheduler/dsa-revision-platform-main
+```
+
+### 2. Configure environment variables
+
+Create the environment files expected by the backend and Docker Compose configuration. Set the database connection details and a strong application secret key.
+
+Do not commit `.env` files, database passwords, JWT secrets, or other credentials.
+
+### 3. Start the application
+
+If using Docker Compose, run the command from the directory containing `docker-compose.yml`:
+
+```bash
 docker compose up --build
 ```
 
-Frontend: `http://localhost:3000` · Backend: `http://localhost:8000` · API docs: `http://localhost:8000/docs`
+For manual setup, install the backend dependencies, configure PostgreSQL, apply the Alembic migrations, and start the FastAPI application. Then install the frontend dependencies and start the Vite development server.
 
-### Option B — Manual local setup
+Refer to the backend and frontend project directories for their dependency files and exact scripts.
 
-**Backend:**
+## Testing
 
-```bash
-cd backend
-python3 -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
-# create backend/.env with DATABASE_URL and SECRET_KEY
-alembic upgrade head
-python seed.py   # optional: seed sample problems
-uvicorn main:app --reload
-```
-
-**Frontend:**
+The repository includes backend and frontend test-related configuration. Run the available tests using the commands and dependencies specified by the project.
 
 ```bash
-cd frontend
-npm install
-npm run dev
+# Backend (from the backend directory, with dependencies installed)
+pytest
+
+# Frontend (from the frontend directory)
+npm test
 ```
 
----
+A successful test run depends on the required environment variables and test database/configuration being available.
 
-## Engineering Notes
+## Current Limitations and Future Improvements
 
-A few decisions and problems worth calling out, since they reflect real tradeoffs rather than tutorial-following:
+- Integrate a real code-execution service and evaluate submissions against test cases.
+- Strengthen validation and error handling around submission and revision workflows.
+- Expand automated tests for authentication, API behavior, and scheduling edge cases.
+- Ensure progress analytics are correctly scoped to the current user's problem library.
+- Further refine the scheduling logic and document the algorithm with tests and examples.
 
-- **Migration history as a single source of truth.** Early in development, the schema was partly created via SQLAlchemy's `create_all()` and partly via incremental Alembic migrations, which worked locally by coincidence but would have failed against a genuinely empty production database. This was diagnosed and fixed by generating one consolidated, verified baseline migration — tested against a disposable scratch database before being trusted anywhere else.
-- **Judge0 self-hosting investigation.** Explored self-hosting the Judge0 execution engine locally via Docker, and hit a real, documented kernel incompatibility (`cgroup v1` support gaps on newer Linux kernels). Rather than compromising the primary development machine to force a fix, the execution layer was deferred to be self-hosted on a dedicated VPS at deployment time — the right call given the actual constraint, not just the path of least resistance.
-- **Coverage-aware weak-topic classification.** A naive "5+ submissions" threshold for judging topic mastery unfairly penalizes small, specialized topics. The analytics engine instead computes classification relative to each topic's actual size, so a topic with only 6 known problems isn't judged by the same absolute threshold as one with 100.
-- **Personal library over shared catalog.** The product pivoted from a fixed demo catalog to a genuine personal library — users add their own previously-solved problems, deduplicated by canonical URL/slug so the same problem isn't recreated per user, while each user's progress, submissions, and hidden solution remain private to them.
+## Security Notes
 
----
+- Keep secrets in environment variables or a hosting platform's secret manager.
+- Never commit API keys, database passwords, or JWT signing secrets.
+- Use a separate test database for automated tests.
+- Treat code execution as an untrusted workload. If an execution service is added, use an isolated sandbox with resource limits.
 
-## Roadmap
+## Author
 
-- [ ] Real code execution via a self-hosted Judge0 instance on a dedicated VPS
-- [ ] Public "Explore" catalog of shared/curated problems, separate from personal libraries
-- [ ] Related-problem and pattern-transfer recommendations
-- [ ] Browser extension for one-click "add to revision" from LeetCode
-
----
-
-## License
-
-This project is for educational and portfolio purposes.
-
-
-
-
+**Madhav Kumar**
